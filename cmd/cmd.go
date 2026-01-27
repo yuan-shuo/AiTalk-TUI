@@ -10,6 +10,10 @@ import (
 )
 
 func Run(c *config.Config, arcPath string) error {
+	// 确保存档目录存在
+	if err := os.MkdirAll(arcPath, 0755); err != nil {
+		return err
+	}
 
 	var req *json.ChatReq
 	var arcfile string
