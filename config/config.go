@@ -14,6 +14,7 @@ type Config struct {
 type Character struct {
 	CharacterSetting string   `yaml:"characterSetting"`
 	Prologue         Prologue `yaml:"prologue"`
+	Memory           int      `yaml:"memory"`
 }
 
 type Prologue struct {

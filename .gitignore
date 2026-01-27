@@ -1,1 +1,5 @@
-data/
+data/archive/*
+data/etc/*
+
+!data/archive
+!data/etc/config.tpl.yaml
