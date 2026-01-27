@@ -10,6 +10,7 @@ import (
 
 const newChatName string = "START A NEW DIALOGUE"
 
+// 询问使用新对话还是读取指定存档
 func askUseWhichChatToStart(arcDir string) (string, error) {
 
 	fmt.Println("** input the number to start that dialogue **")
