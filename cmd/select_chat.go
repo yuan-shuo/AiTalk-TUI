@@ -5,7 +5,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 const newChatName string = "START A NEW DIALOGUE"
@@ -23,7 +25,8 @@ func askUseWhichChatToStart(arcDir string) (string, error) {
 	hash[0] = newChatName
 
 	for k, v := range hash {
-		fmt.Printf("[%d] %s\n", k, v)
+		name := strings.TrimSuffix(v, filepath.Ext(v))
+		fmt.Printf("[%d] %s\n", k, name)
 	}
 
 	in := bufio.NewScanner(os.Stdin)

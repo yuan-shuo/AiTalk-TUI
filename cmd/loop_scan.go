@@ -14,7 +14,7 @@ const (
 	agentPrompt string = `AGENT:`
 )
 
-func loopScan(req *json.ChatReq, c *config.Config) error {
+func loopScan(req *json.ChatReq, c *config.Config, arcFilePath string) error {
 	in := bufio.NewScanner(os.Stdin)
 	// 如果启用了开场白，添加 assistant 的开场消息
 	if c.Character.Prologue.Enabled {
@@ -28,7 +28,7 @@ func loopScan(req *json.ChatReq, c *config.Config) error {
 
 		text := in.Text()
 
-		aiResp, err := core.Chat(text, req, c)
+		aiResp, err := core.Chat(text, req, c, arcFilePath)
 		if err != nil {
 			return err
 		}

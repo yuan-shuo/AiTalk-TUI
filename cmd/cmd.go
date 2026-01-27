@@ -29,7 +29,7 @@ func Run(c *config.Config, arcPath string) error {
 	}
 
 	// 开始循环对话
-	err = loopScan(req, c)
+	err = loopScan(req, c, filepath.Join(arcPath, arcName))
 	if err != nil {
 		return err
 	}

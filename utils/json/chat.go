@@ -2,6 +2,7 @@ package json
 
 import (
 	"aitalk/config"
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -49,15 +50,39 @@ func LoadChat(c *config.Config, arcFilePath string) (*ChatReq, error) {
 	}, nil
 }
 
-// 读取 JSON 文件并解析到 []Message
+// 读取 .jsonl 文件并返回 []Message
 func loadMessagesFromFile(path string) ([]Message, error) {
-	data, err := os.ReadFile(path)
+	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
+
 	var msgs []Message
-	if err := json.Unmarshal(data, &msgs); err != nil {
-		return nil, err
+	sc := bufio.NewScanner(f)
+	for sc.Scan() {
+		line := sc.Bytes()
+		if len(line) == 0 { // 跳过空行
+			continue
+		}
+		var m Message
+		if err := json.Unmarshal(line, &m); err != nil {
+			return nil, err
+		}
+		msgs = append(msgs, m)
 	}
-	return msgs, nil
+	return msgs, sc.Err()
 }
+
+// // 读取 JSON 文件并解析到 []Message
+// func loadMessagesFromFile(path string) ([]Message, error) {
+// 	data, err := os.ReadFile(path)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	var msgs []Message
+// 	if err := json.Unmarshal(data, &msgs); err != nil {
+// 		return nil, err
+// 	}
+// 	return msgs, nil
+// }

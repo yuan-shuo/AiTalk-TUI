@@ -14,14 +14,14 @@ func ReadHistoryFiles(dir string) (map[int]string, error) {
 		return nil, err
 	}
 
-	// 收集所有 .json 文件名
+	// 收集所有 .jsonl -> ( ndjson 便于O(1)级写入 ) 文件名
 	var files []string
 	for _, e := range entries {
 		if e.IsDir() {
 			continue
 		}
 		name := e.Name()
-		if filepath.Ext(name) == ".json" {
+		if filepath.Ext(name) == ".jsonl" {
 			files = append(files, name)
 		}
 	}

@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-func Chat(text string, req *json.ChatReq, c *config.Config) (string, error) {
+func Chat(text string, req *json.ChatReq, c *config.Config, arcFilePath string) (string, error) {
 	// 请求体转换为json
 	req.Messages = append(req.Messages, json.Message{Role: "user", Content: text})
 	reqJson, err := json.TransToAiNeedJSON(req)
@@ -31,6 +31,11 @@ func Chat(text string, req *json.ChatReq, c *config.Config) (string, error) {
 	aiResp := data.Choices[0].Message.Content
 
 	req.Messages = append(req.Messages, json.Message{Role: "assistant", Content: aiResp})
+
+	// 当AI回复成功后，将此轮对话写入存档文件
+	json.AppendMessage(arcFilePath, json.Message{Role: "user", Content: text})
+	json.AppendMessage(arcFilePath, json.Message{Role: "assistant", Content: aiResp})
+
 	// 更新对话信息
 	// req.Messages = append(req.Messages,
 	// 	json.Message{Role: "user", Content: text},
