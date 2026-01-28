@@ -77,12 +77,7 @@ func Run(c *config.Config, arcPath string, rolePath string) error {
 			return fmt.Errorf("对话文件已存在: %s", arcfile)
 		}
 
-		// 创建存档文件
-		_, err = os.Create(arcfile)
-		if err != nil {
-			return err
-		}
-
+		// 注意：不在此处创建空文件，等到有实际对话内容时再创建
 		// 初始化对话
 		req = json.NewChat(c)
 

@@ -4,7 +4,6 @@ import (
 	"aitalk/config"
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"os"
 )
 
@@ -35,10 +34,29 @@ func NewChat(c *config.Config) *ChatReq {
 func LoadChat(c *config.Config, arcFilePath string) (*ChatReq, error) {
 	arc, err := loadMessagesFromFile(arcFilePath)
 	if err != nil {
+		// 如果文件不存在，返回空的消息列表而不是错误
+		if os.IsNotExist(err) {
+			return &ChatReq{
+				Model:     c.ModelApi.Model,
+				Messages:  []Message{},
+				Thinking:  Thinking{Type: c.ModelApi.Thinking},
+				Stream:    c.ModelApi.Stream,
+				MaxTokens: c.ModelApi.MaxTokens,
+				Temp:      c.ModelApi.Temp,
+			}, nil
+		}
 		return nil, err
 	}
-	if arc == nil {
-		return nil, fmt.Errorf("no data in %s", arcFilePath)
+	// 如果文件为空或没有有效数据，返回空的消息列表
+	if len(arc) == 0 {
+		return &ChatReq{
+			Model:     c.ModelApi.Model,
+			Messages:  []Message{},
+			Thinking:  Thinking{Type: c.ModelApi.Thinking},
+			Stream:    c.ModelApi.Stream,
+			MaxTokens: c.ModelApi.MaxTokens,
+			Temp:      c.ModelApi.Temp,
+		}, nil
 	}
 	return &ChatReq{
 		Model:     c.ModelApi.Model,
