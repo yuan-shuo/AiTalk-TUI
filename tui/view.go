@@ -154,21 +154,29 @@ func (m Model) renderSystemMessage(content string) string {
 func (m Model) renderStatusBar() string {
 	// 模式指示器
 	modeIndicator := getModeStyle(m.mode).Render(getModeText(m.mode))
-	
+
 	// 帮助文本
 	helpText := helpStyle.Render(getHelpText(m.mode))
-	
+
 	// 消息计数
 	msgCount := helpStyle.Render(fmt.Sprintf("%d messages", len(m.messages)))
-	
+
 	// 组合状态栏
 	left := lipgloss.JoinHorizontal(lipgloss.Left, modeIndicator, "  ", helpText)
 	right := msgCount
-	
+
+	// 计算中间空格数量，确保不为负数
+	leftWidth := lipgloss.Width(left)
+	rightWidth := lipgloss.Width(right)
+	spaceCount := m.width - leftWidth - rightWidth - 4
+	if spaceCount < 0 {
+		spaceCount = 0
+	}
+
 	// 使用PlaceHorizontal来布局
-	statusContent := lipgloss.JoinHorizontal(lipgloss.Left, left, 
-		strings.Repeat(" ", m.width-lipgloss.Width(left)-lipgloss.Width(right)-4), right)
-	
+	statusContent := lipgloss.JoinHorizontal(lipgloss.Left, left,
+		strings.Repeat(" ", spaceCount), right)
+
 	return statusBarStyle.Width(m.width).Render(statusContent)
 }
 
