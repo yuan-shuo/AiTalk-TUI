@@ -219,8 +219,8 @@ func (m Model) renderStatusBar() string {
 	// 帮助文本
 	helpText := helpStyle.Render(getHelpText(m.mode))
 
-	// 消息计数
-	msgCount := helpStyle.Render(fmt.Sprintf("%d messages", len(m.messages)))
+	// 消息计数(len_mes-1: 去掉system那条的计数)
+	msgCount := helpStyle.Render(fmt.Sprintf("%d messages", len(m.messages)-1))
 
 	// 组合状态栏
 	left := lipgloss.JoinHorizontal(lipgloss.Left, modeIndicator, "  ", helpText)

@@ -77,6 +77,14 @@ func Run(c *config.Config, arcPath string, rolePath string) error {
 			return fmt.Errorf("对话文件已存在: %s", arcfile)
 		}
 
+		// 读取角色开场白并设置到配置中
+		roleDir := filepath.Join(rolePath, roleBaseName+".role")
+		prologuePath := filepath.Join(roleDir, "prologue")
+		if content, err := os.ReadFile(prologuePath); err == nil && len(content) > 0 {
+			c.Character.Prologue.Content = string(content)
+			c.Character.Prologue.Enabled = true
+		}
+
 		// 注意：不在此处创建空文件，等到有实际对话内容时再创建
 		// 初始化对话
 		req = json.NewChat(c)
