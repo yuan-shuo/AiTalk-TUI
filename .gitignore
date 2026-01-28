@@ -2,5 +2,7 @@ data/archive/
 data/etc/
 data/role/
 
+bin/
+
 !data/etc/config.tpl.yaml
 .trae/
