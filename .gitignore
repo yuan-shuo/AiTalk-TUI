@@ -1,5 +1,6 @@
-data/archive/*
-data/etc/*
+data/archive/
+data/etc/
+data/role/
 
-!data/archive
 !data/etc/config.tpl.yaml
+.trae/

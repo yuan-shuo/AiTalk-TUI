@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	ModelApi  ModelApi  `yaml:"modelApi"`  // 对应 YAML 节点 modelApi
-	Character Character `yaml:"character"` // 角色卡配置
+	ModelApi   ModelApi  `yaml:"modelApi"`   // 对应 YAML 节点 modelApi
+	Character  Character `yaml:"character"`  // 角色卡配置
+	TextEditor string    `yaml:"textEditor"` // 文本编辑器
 }
 
 type Character struct {

@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-func Chat(text string, req *json.ChatReq, c *config.Config, arcFilePath string) (string, error) {
+func Chat(text string, req *json.ChatReq, c *config.Config, arcFilePath string, isFirstDialogue bool, prologueContent string) (string, error) {
 
 	// 0. 记忆长度：memory 轮对话 => 最多 2*memory 条（不含 system）
 	maxPairs := c.Character.Memory
@@ -44,6 +44,11 @@ func Chat(text string, req *json.ChatReq, c *config.Config, arcFilePath string) 
 	}
 
 	// 当AI回复成功后，将此轮对话写入存档文件
+	// 如果是第一次对话，先写入开场白
+	if isFirstDialogue && prologueContent != "" {
+		json.AppendMessage(arcFilePath, json.Message{Role: "assistant", Content: prologueContent})
+	}
+	// 写入用户回复和AI回复
 	json.AppendMessage(arcFilePath, json.Message{Role: "user", Content: text})
 	json.AppendMessage(arcFilePath, json.Message{Role: "assistant", Content: aiResp})
 

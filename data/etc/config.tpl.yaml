@@ -11,18 +11,11 @@ modelApi:
   maxTokens: 65536
   temp: 1.0
 
-# 角色配置
+# 角色对话配置
 character:
-
-  # 人物设定
-  characterSetting: |
-    "你是一名AI助理，可以为用户提供帮助"
-
-  # 开场白
-  prologue:
-    enabled: true
-    content: |
-      "你好~ 请问今天需要我帮助你做些什么呢？"
 
   # 对话记忆轮数
   memory: 6
+
+# 文本编辑器
+textEditor: "vi"
