@@ -19,6 +19,8 @@ func loopScan(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath 
 
 	// 修改角色卡名称
 	agentPrompt = fmt.Sprintf("%s:", roleBaseName)
+	// 修改玩家名称
+	userPrompt = fmt.Sprintf("%s:", c.Player.Name)
 
 	in := bufio.NewScanner(os.Stdin)
 

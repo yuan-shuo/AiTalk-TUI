@@ -10,12 +10,17 @@ type Config struct {
 	ModelApi   ModelApi  `yaml:"modelApi"`   // 对应 YAML 节点 modelApi
 	Character  Character `yaml:"character"`  // 角色卡配置
 	TextEditor string    `yaml:"textEditor"` // 文本编辑器
+	Player     Player    `yaml:"player"`     // 玩家本人设定
 }
 
 type Character struct {
 	CharacterSetting string   `yaml:"characterSetting"`
 	Prologue         Prologue `yaml:"prologue"`
 	Memory           int      `yaml:"memory"`
+}
+
+type Player struct {
+	Name string `yaml:"name"`
 }
 
 type Prologue struct {

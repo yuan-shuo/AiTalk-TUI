@@ -31,8 +31,9 @@ func Run(c *config.Config, arcPath string, rolePath string) error {
 	if err != nil {
 		return err
 	}
+
 	if arcName == newDialogueName {
-		// 开启新对话
+		// 1. 新建对话逻辑
 
 		// 询问使用什么角色
 		roleName, err := askUseWhichRole(rolePath)
@@ -86,6 +87,8 @@ func Run(c *config.Config, arcPath string, rolePath string) error {
 		req = json.NewChat(c)
 
 	} else if arcName != newDialogueName && arcName != "" {
+		// 2. 读取已有对话逻辑
+
 		arcfile = filepath.Join(arcPath, arcName)
 		// 读取存档
 		req, err = json.LoadChat(c, arcfile)
