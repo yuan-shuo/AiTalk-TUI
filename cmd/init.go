@@ -2,14 +2,19 @@ package cmd
 
 import (
 	"bufio"
+	_ "embed"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/spf13/cobra"
 )
+
+//go:embed skel/config.yaml
+var configTemplate []byte
 
 var initCmd = &cobra.Command{
 	Use:   "init",
@@ -42,39 +47,30 @@ var initCmd = &cobra.Command{
 			return
 		}
 
-		// 读取模板文件
-		templatePath := filepath.Join(".", "embed", "skel", "config.yaml")
-		tmplContent, err := os.ReadFile(templatePath)
-		if err != nil {
-			fmt.Printf("读取模板文件失败：%v\n", err)
-			return
-		}
-
-		// 创建模板
-		tmpl, err := template.New("config").Parse(string(tmplContent))
+		// 使用嵌入的模板文件
+		tmpl, err := template.New("config").Parse(string(configTemplate))
 		if err != nil {
 			fmt.Printf("解析模板失败：%v\n", err)
 			return
 		}
 
-		// 创建配置文件
-		configFile, err := os.Create(ConfigPath)
-		if err != nil {
-			fmt.Printf("创建配置文件失败：%v\n", err)
-			return
-		}
-		defer configFile.Close()
-
-		// 填充模板并写入配置文件
+		// 填充模板数据
 		data := struct {
 			TextEditor string
 		}{
 			TextEditor: textEditor,
 		}
-		if err := tmpl.Execute(configFile, data); err != nil {
-			fmt.Printf("写入配置文件失败：%v\n", err)
-			// 清理配置文件
-			os.Remove(ConfigPath)
+
+		// 执行模板渲染
+		var buf strings.Builder
+		if err := tmpl.Execute(&buf, data); err != nil {
+			fmt.Printf("渲染模板失败：%v\n", err)
+			return
+		}
+
+		// 创建并写入配置文件
+		if err := os.WriteFile(ConfigPath, []byte(buf.String()), 0644); err != nil {
+			fmt.Printf("创建配置文件失败：%v\n", err)
 			return
 		}
 
