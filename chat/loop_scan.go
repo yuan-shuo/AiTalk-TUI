@@ -3,6 +3,7 @@ package chat
 import (
 	"aitalk/config"
 	"aitalk/core"
+	"aitalk/tui"
 	"aitalk/utils/json"
 	"bufio"
 	"fmt"
@@ -15,20 +16,54 @@ var (
 	agentPrompt string = `AGENT:`
 )
 
-func loopScan(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath string, roleBaseName string) error {
+// useTUI 控制是否使用TUI界面，默认启用
+var useTUI = true
 
+func loopScan(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath string, roleBaseName string) error {
+	// 读取角色的 setting 文件内容
+	settingContent := readRoleSetting(rolePath, roleBaseName)
+
+	// 读取角色的 prologue 文件内容
+	prologueContent := readRolePrologue(rolePath, roleBaseName)
+
+	// 如果使用TUI模式
+	if useTUI {
+		return runTUI(req, c, arcFilePath, rolePath, roleBaseName, settingContent, prologueContent)
+	}
+
+	// 否则使用传统命令行模式
+	return runSimpleMode(req, c, arcFilePath, rolePath, roleBaseName, settingContent, prologueContent)
+}
+
+// runTUI 运行TUI模式
+func runTUI(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath string, roleBaseName string, settingContent string, prologueContent string) error {
+	// 获取存档目录和文件名
+	arcDir := filepath.Dir(arcFilePath)
+	arcFile := filepath.Base(arcFilePath)
+
+	// 运行TUI
+	return tui.Run(
+		req.Messages,
+		roleBaseName,
+		c.Player.Name,
+		arcFile,
+		arcDir,
+		c,
+		req,
+		rolePath,
+		settingContent,
+		prologueContent,
+	)
+}
+
+// runSimpleMode 运行传统简单模式
+func runSimpleMode(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath string, roleBaseName string, settingContent string, prologueContent string) error {
 	// 修改角色卡名称
 	agentPrompt = fmt.Sprintf("%s:", roleBaseName)
 	// 修改玩家名称
 	userPrompt = fmt.Sprintf("%s:", c.Player.Name)
 
 	in := bufio.NewScanner(os.Stdin)
-
-	// 读取角色的 setting 文件内容
-	settingContent := readRoleSetting(rolePath, roleBaseName)
-
-	// 读取角色的 prologue 文件内容
-	prologueContent := readRolePrologue(rolePath, roleBaseName)
 
 	// 打印角色开场白
 	if c.Character.Prologue.Enabled && prologueContent != "" {

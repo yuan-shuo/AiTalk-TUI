@@ -3,3 +3,5 @@ bin/
 
 .trae/
 .vscode/
+
+*.exe

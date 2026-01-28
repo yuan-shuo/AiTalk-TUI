@@ -16,7 +16,7 @@ const newDialogueName string = "创建一个新对话 / create a new dialogue"
 // 询问使用已有对话还是创建新对话
 func askUseWhichChatToStart(arcDir string) (string, error) {
 
-	fmt.Println("** input the number to start that dialogue **")
+	fmt.Println("** 已有的对话id清单 / dialogue id list **")
 
 	hash, err := archive.ReadDialogueFiles(arcDir)
 	if err != nil {
@@ -31,7 +31,7 @@ func askUseWhichChatToStart(arcDir string) (string, error) {
 	}
 
 	in := bufio.NewScanner(os.Stdin)
-	fmt.Print("select the number: ")
+	fmt.Print("输入想要开始的对话id / select the number: ")
 	if !in.Scan() {
 		return "", fmt.Errorf("no input was given")
 	}
@@ -49,7 +49,7 @@ func askUseWhichChatToStart(arcDir string) (string, error) {
 // 询问使用已有角色还是创建新角色
 func askUseWhichRole(roleDir string) (string, error) {
 
-	fmt.Println("** input the number to select a role **")
+	fmt.Println("** 已有的角色id清单 / role id list **")
 
 	hash, err := archive.ReadRoleDirs(roleDir)
 	if err != nil {
@@ -64,7 +64,7 @@ func askUseWhichRole(roleDir string) (string, error) {
 	}
 
 	in := bufio.NewScanner(os.Stdin)
-	fmt.Print("select the number: ")
+	fmt.Print("输入想要开始对话的角色id / select the number: ")
 	if !in.Scan() {
 		return "", fmt.Errorf("no input was given")
 	}
