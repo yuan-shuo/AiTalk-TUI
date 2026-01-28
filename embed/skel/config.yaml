@@ -1,0 +1,21 @@
+# 模型接口配置
+modelApi:
+  url: "https://open.bigmodel.cn/api/paas/v4/chat/completions" # [*] 把这行改为你的模型接口请求地址
+  model: "glm-4.7-flash" # [*] 把这行改为你想要用的模型名称
+  apiKey: <your api key> # [*] 把这行改为你的api密钥
+  thinking: "disabled"
+  stream: false
+  maxTokens: 65536
+  temp: 1.0
+
+# 角色对话配置
+character:
+
+  # 对话记忆轮数
+  memory: 6
+
+# 文本编辑器
+textEditor: "{{.TextEditor}}"
+
+player:
+  name: <your name> # [*] 把这行改为你的名字

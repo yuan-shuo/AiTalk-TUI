@@ -1,8 +1,5 @@
-data/archive/
-data/etc/
-data/role/
-
+data/
 bin/
 
-!data/etc/config.tpl.yaml
 .trae/
+.vscode/
