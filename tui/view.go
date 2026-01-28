@@ -37,7 +37,7 @@ func (m Model) View() string {
 func (m Model) renderTitle() string {
 	title := titleStyle.Render(fmt.Sprintf("🎭 %s", m.roleName))
 	subtitle := subtitleStyle.Render(fmt.Sprintf("📁 %s", m.arcFile))
-	
+
 	return lipgloss.JoinHorizontal(lipgloss.Left, title, "  ", subtitle)
 }
 
@@ -45,7 +45,7 @@ func (m Model) renderTitle() string {
 func (m Model) renderViewport() string {
 	content := m.renderMessages()
 	m.viewport.SetContent(content)
-	
+
 	// 设置viewport高度（减去标题、状态栏和输入框的高度）
 	viewportHeight := m.height - 8
 	if viewportHeight < 5 {
@@ -93,12 +93,61 @@ func (m Model) renderMessage(msg json.Message) string {
 	}
 }
 
+// wrapText 将文本按指定宽度自动换行
+func wrapText(text string, maxWidth int) string {
+	if maxWidth <= 0 {
+		return text
+	}
+
+	var result []string
+	lines := strings.Split(text, "\n")
+
+	for _, line := range lines {
+		// 处理每一行
+		currentLine := ""
+		currentWidth := 0
+
+		// 按字符处理（支持中文）
+		for _, char := range line {
+			charWidth := 1
+			if char > 127 {
+				// 中文字符通常占2个宽度
+				charWidth = 2
+			}
+
+			if currentWidth+charWidth > maxWidth && currentLine != "" {
+				result = append(result, currentLine)
+				currentLine = string(char)
+				currentWidth = charWidth
+			} else {
+				currentLine += string(char)
+				currentWidth += charWidth
+			}
+		}
+
+		if currentLine != "" {
+			result = append(result, currentLine)
+		}
+	}
+
+	return strings.Join(result, "\n")
+}
+
 // renderUserMessage 渲染用户消息
 func (m Model) renderUserMessage(content string) string {
 	name := userNameStyle.Render(fmt.Sprintf("[%s]", m.playerName))
-	
+
+	// 计算可用宽度（考虑边距和气泡样式）
+	maxContentWidth := m.width - 10
+	if maxContentWidth < 20 {
+		maxContentWidth = 20
+	}
+
+	// 自动换行处理
+	wrappedContent := wrapText(content, maxContentWidth)
+
 	// 处理多行内容
-	lines := strings.Split(content, "\n")
+	lines := strings.Split(wrappedContent, "\n")
 	var contentLines []string
 	for _, line := range lines {
 		contentLines = append(contentLines, messageContentStyle.Render(line))
@@ -107,23 +156,26 @@ func (m Model) renderUserMessage(content string) string {
 
 	// 用户消息右对齐
 	bubble := userBubbleStyle.Render(renderedContent)
-	
-	// 计算缩进使消息右对齐
-	availableWidth := m.width - lipgloss.Width(bubble) - 2
-	if availableWidth < 0 {
-		availableWidth = 0
-	}
-	
-	return lipgloss.PlaceHorizontal(m.width, lipgloss.Right, 
+
+	return lipgloss.PlaceHorizontal(m.width, lipgloss.Right,
 		lipgloss.JoinVertical(lipgloss.Right, name, bubble))
 }
 
 // renderAgentMessage 渲染AI消息
 func (m Model) renderAgentMessage(content string) string {
 	name := agentNameStyle.Render(fmt.Sprintf("[%s]", m.roleName))
-	
+
+	// 计算可用宽度（考虑边距和气泡样式）
+	maxContentWidth := m.width - 6
+	if maxContentWidth < 20 {
+		maxContentWidth = 20
+	}
+
+	// 自动换行处理
+	wrappedContent := wrapText(content, maxContentWidth)
+
 	// 处理多行内容
-	lines := strings.Split(content, "\n")
+	lines := strings.Split(wrappedContent, "\n")
 	var contentLines []string
 	for _, line := range lines {
 		contentLines = append(contentLines, messageContentStyle.Render(line))
@@ -131,16 +183,25 @@ func (m Model) renderAgentMessage(content string) string {
 	renderedContent := strings.Join(contentLines, "\n")
 
 	bubble := agentBubbleStyle.Render(renderedContent)
-	
+
 	return lipgloss.JoinVertical(lipgloss.Left, name, bubble)
 }
 
 // renderSystemMessage 渲染系统消息
 func (m Model) renderSystemMessage(content string) string {
 	name := systemNameStyle.Render("[System]")
-	
+
+	// 计算可用宽度
+	maxContentWidth := m.width - 4
+	if maxContentWidth < 20 {
+		maxContentWidth = 20
+	}
+
+	// 自动换行处理
+	wrappedContent := wrapText(content, maxContentWidth)
+
 	// 处理多行内容
-	lines := strings.Split(content, "\n")
+	lines := strings.Split(wrappedContent, "\n")
 	var contentLines []string
 	for _, line := range lines {
 		contentLines = append(contentLines, messageContentStyle.Render(line))
@@ -187,7 +248,7 @@ func (m Model) renderInputBox() string {
 		inputView := m.textarea.View()
 		return inputBoxFocusedStyle.Width(m.width - 4).Render(inputView)
 	}
-	
+
 	// 普通模式下显示提示
 	hint := helpStyle.Render("按 i 进入输入模式")
 	return inputBoxStyle.Width(m.width - 4).Render(hint)
