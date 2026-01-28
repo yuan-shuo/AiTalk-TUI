@@ -42,3 +42,15 @@ att edit role
 att edit config
 ```
 
+当然你也可以手动前往路径编辑:
+
+```bash
+// macOS: ~/Library/Application Support
+// Linux/FreeBSD: ~/.local/share 或 $XDG_DATA_HOME
+// win: 使用 %APPDATA% 环境变量（通常是 C:\Users\<用户名>\AppData\Roaming）
+
+/role # 角色目录
+/archive # 对话历史文件目录
+/etc # 配置文件目录
+```
+
