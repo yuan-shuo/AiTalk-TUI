@@ -3,6 +3,7 @@ package tui
 import (
 	"aitalk/utils/json"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -36,7 +37,9 @@ func (m Model) View() string {
 // renderTitle 渲染标题栏
 func (m Model) renderTitle() string {
 	title := titleStyle.Render(fmt.Sprintf("🎭 %s", m.roleName))
-	subtitle := subtitleStyle.Render(fmt.Sprintf("📁 %s", m.arcFile))
+	// 去掉 .jsonl 后缀显示
+	displayName := strings.TrimSuffix(m.arcFile, filepath.Ext(m.arcFile))
+	subtitle := subtitleStyle.Render(fmt.Sprintf("📁 %s", displayName))
 
 	return lipgloss.JoinHorizontal(lipgloss.Left, title, "  ", subtitle)
 }
@@ -219,8 +222,8 @@ func (m Model) renderStatusBar() string {
 	// 帮助文本
 	helpText := helpStyle.Render(getHelpText(m.mode))
 
-	// 消息计数(len_mes-1: 去掉system那条的计数)
-	msgCount := helpStyle.Render(fmt.Sprintf("%d messages", len(m.messages)-1))
+	// 消息计数
+	msgCount := helpStyle.Render(fmt.Sprintf("%d messages", len(m.messages)))
 
 	// 组合状态栏
 	left := lipgloss.JoinHorizontal(lipgloss.Left, modeIndicator, "  ", helpText)
