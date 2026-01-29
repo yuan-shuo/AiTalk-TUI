@@ -28,7 +28,7 @@ func Run(c *config.Config, arcPath string, rolePath string) error {
 	var roleName string // 角色显示名
 
 	// 询问使用什么对话
-	arcName, err := askUseWhichChatToStart(arcPath)
+	arcName, err := askUseWhichChatToStart(arcPath, rolePath)
 	if err != nil {
 		return err
 	}

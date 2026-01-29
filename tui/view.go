@@ -37,8 +37,18 @@ func (m Model) View() string {
 // renderTitle 渲染标题栏
 func (m Model) renderTitle() string {
 	title := titleStyle.Render(fmt.Sprintf("🎭 %s", m.roleName))
-	// 去掉 .jsonl 后缀显示
+	// // 去掉 .jsonl 后缀显示
+	// displayName := strings.TrimSuffix(m.arcFile, filepath.Ext(m.arcFile))
+	// subtitle := subtitleStyle.Render(fmt.Sprintf("📁 %s", displayName))
+
+	// 去掉 .jsonl 后缀
 	displayName := strings.TrimSuffix(m.arcFile, filepath.Ext(m.arcFile))
+
+	// 去掉 hash 前缀（例如 "a2esd-test" -> "test"）
+	if idx := strings.Index(displayName, "-"); idx != -1 {
+		displayName = displayName[idx+1:]
+	}
+	// 顶部显示的对话名
 	subtitle := subtitleStyle.Render(fmt.Sprintf("📁 %s", displayName))
 
 	return lipgloss.JoinHorizontal(lipgloss.Left, title, "  ", subtitle)
