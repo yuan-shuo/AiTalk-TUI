@@ -1,6 +1,6 @@
 # Ai Talk in TUI: 在终端中游玩AI角色扮演
 
-仅在终端中实现AI角色扮演，极度轻量级，全平台全架构，纯二进制极易使用，甚至不需要桌面图形驱动，**只要有显示器和一颗CPU就能玩AI角色卡**
+仅在终端中实现AI角色扮演，极度轻量级，全平台全架构，纯二进制极易使用，甚至不需要桌面图形驱动，**只要有显示器、网卡和一颗CPU就能玩AI角色卡**
 
 <img src="./docs/screen_shot.png" width="50%" alt="终端截图">
 
@@ -14,9 +14,7 @@
 
 （例如我是win11，cpu为amd64，那我就下载：aitalk-tui_x.x.x_windows_amd64.zip这个文件然后解压后将内部文件放入$PATH就完事了）
 
-* 看不懂？B站视频手把手教学！：
-
-
+* 看不懂？B站视频手把手教学！：[【教程】在终端中游玩AI角色卡_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1wNzfBaEPw/?vd_source=034330e0ba6ffd78e6e95978f833033b)
 
 ## 如何使用？
 
@@ -28,10 +26,6 @@ att init
 # 开始对话
 att talk
 ```
-
-* 看不懂？B站视频手把手教学！：
-
-
 
 编辑指令：
 
