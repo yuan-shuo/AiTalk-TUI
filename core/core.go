@@ -5,6 +5,7 @@ import (
 	"aitalk/config"
 	"aitalk/utils/json"
 	"fmt"
+	"os"
 )
 
 func Chat(text string, req *json.ChatReq, c *config.Config, arcFilePath string, isFirstDialogue bool, prologueContent string) (string, error) {
@@ -44,14 +45,24 @@ func Chat(text string, req *json.ChatReq, c *config.Config, arcFilePath string, 
 	}
 
 	// 当AI回复成功后，将此轮对话写入存档文件
-	// 如果是第一次对话，先写入开场白
-	if isFirstDialogue && prologueContent != "" {
+	// 如果是第一次对话，先写入开场白（同时如果存档文件存张且不为空则不写入开场白）
+	if isFirstDialogue && prologueContent != "" && !arcFileInPathIsExists(arcFilePath) {
 		json.AppendMessage(arcFilePath, json.Message{Role: "assistant", Content: prologueContent})
 	}
+
 	// 写入用户回复和AI回复
 	json.AppendMessage(arcFilePath, json.Message{Role: "user", Content: text})
 	json.AppendMessage(arcFilePath, json.Message{Role: "assistant", Content: aiResp})
 
 	// 返回 ai 回复内容
 	return aiResp, nil
+}
+
+// arcFileExists 检查存档文件是否存在且不为空
+func arcFileInPathIsExists(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return info.Size() > 0
 }

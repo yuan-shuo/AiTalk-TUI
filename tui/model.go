@@ -3,6 +3,9 @@ package tui
 import (
 	"aitalk/config"
 	"aitalk/utils/json"
+	"os"
+	"path/filepath"
+
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -67,6 +70,16 @@ func waitForError(ch chan error) tea.Cmd {
 // 消息类型定义
 type responseMsg string
 type errMsg error
+
+// arcFileExists 检查存档文件是否存在且不为空
+func (m *Model) arcFileExists() bool {
+	arcFilePath := filepath.Join(m.arcDir, m.arcFile)
+	info, err := os.Stat(arcFilePath)
+	if err != nil {
+		return false
+	}
+	return info.Size() > 0
+}
 
 // NewModel 创建新的TUI模型
 func NewModel(

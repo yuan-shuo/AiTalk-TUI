@@ -19,12 +19,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// 处理窗口大小变化
 		m.width = msg.Width
 		m.height = msg.Height
-		
+
 		// 初始化或调整viewport
 		m.viewport = viewport.New(msg.Width, msg.Height-8)
 		m.viewport.SetContent(m.renderMessages())
 		m.viewport.GotoBottom()
-		
+
 		// 调整textarea
 		m.textarea.SetWidth(msg.Width - 6)
 		m.textarea.SetHeight(3)
@@ -42,17 +42,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// 处理AI回复
 		m.loading = false
 		aiResp := string(msg)
-		
+
 		// 添加AI消息到列表
 		m.messages = append(m.messages, json.Message{
 			Role:    "assistant",
 			Content: aiResp,
 		})
-		
+
 		// 更新viewport内容并滚动到底部
 		m.viewport.SetContent(m.renderMessages())
 		m.viewport.GotoBottom()
-		
+
 		// 继续等待下一次回复
 		cmds = append(cmds, waitForResponse(m.respCh))
 
@@ -214,10 +214,10 @@ func (m *Model) sendToAI(content string) {
 			}
 		}
 
-		// 如果是第一次对话，添加开场白
-		if m.isFirst && m.prologue != "" {
-			newMessages = append(newMessages, json.Message{Role: "assistant", Content: m.prologue})
-		}
+		// // 如果是第一次对话且存档文件为空，添加开场白
+		// if m.isFirst && m.prologue != "" && !m.arcFileExists() {
+		// 	newMessages = append(newMessages, json.Message{Role: "assistant", Content: m.prologue})
+		// }
 
 		// 更新请求消息
 		m.chatReq.Messages = newMessages
