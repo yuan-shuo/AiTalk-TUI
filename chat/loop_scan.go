@@ -19,32 +19,32 @@ var (
 // useTUI 控制是否使用TUI界面，默认启用
 var useTUI = true
 
-func loopScan(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath string, roleBaseName string) error {
-	// 读取角色的 setting 文件内容
-	settingContent := readRoleSetting(rolePath, roleBaseName)
+func loopScan(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath string, roleID string, roleName string) error {
+	// 读取角色的 setting 文件内容（通过roleID定位）
+	settingContent := readRoleSetting(rolePath, roleID)
 
-	// 读取角色的 prologue 文件内容
-	prologueContent := readRolePrologue(rolePath, roleBaseName)
+	// 读取角色的 prologue 文件内容（通过roleID定位）
+	prologueContent := readRolePrologue(rolePath, roleID)
 
 	// 如果使用TUI模式
 	if useTUI {
-		return runTUI(req, c, arcFilePath, rolePath, roleBaseName, settingContent, prologueContent)
+		return runTUI(req, c, arcFilePath, rolePath, roleID, roleName, settingContent, prologueContent)
 	}
 
 	// 否则使用传统命令行模式
-	return runSimpleMode(req, c, arcFilePath, rolePath, roleBaseName, settingContent, prologueContent)
+	return runSimpleMode(req, c, arcFilePath, rolePath, roleID, roleName, settingContent, prologueContent)
 }
 
 // runTUI 运行TUI模式
-func runTUI(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath string, roleBaseName string, settingContent string, prologueContent string) error {
+func runTUI(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath string, roleID string, roleName string, settingContent string, prologueContent string) error {
 	// 获取存档目录和文件名
 	arcDir := filepath.Dir(arcFilePath)
 	arcFile := filepath.Base(arcFilePath)
 
-	// 运行TUI
+	// 运行TUI（使用roleName作为显示名）
 	return tui.Run(
 		req.Messages,
-		roleBaseName,
+		roleName, // 使用显示名
 		c.Player.Name,
 		arcFile,
 		arcDir,
@@ -57,9 +57,9 @@ func runTUI(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath st
 }
 
 // runSimpleMode 运行传统简单模式
-func runSimpleMode(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath string, roleBaseName string, settingContent string, prologueContent string) error {
-	// 修改角色卡名称
-	agentPrompt = fmt.Sprintf("%s:", roleBaseName)
+func runSimpleMode(req *json.ChatReq, c *config.Config, arcFilePath string, rolePath string, roleID string, roleName string, settingContent string, prologueContent string) error {
+	// 修改角色卡名称（使用显示名）
+	agentPrompt = fmt.Sprintf("%s:", roleName)
 	// 修改玩家名称
 	userPrompt = fmt.Sprintf("%s:", c.Player.Name)
 
@@ -119,13 +119,13 @@ func runSimpleMode(req *json.ChatReq, c *config.Config, arcFilePath string, role
 	return nil
 }
 
-// 读取角色的 setting 文件内容
-func readRoleSetting(rolePath string, roleBaseName string) string {
-	if roleBaseName == "" {
+// 读取角色的 setting 文件内容（通过roleID定位）
+func readRoleSetting(rolePath string, roleID string) string {
+	if roleID == "" {
 		return ""
 	}
 
-	settingPath := filepath.Join(rolePath, roleBaseName+".role", "setting")
+	settingPath := filepath.Join(rolePath, roleID+".role", "setting")
 	content, err := os.ReadFile(settingPath)
 	if err != nil {
 		return ""
@@ -134,13 +134,13 @@ func readRoleSetting(rolePath string, roleBaseName string) string {
 	return string(content)
 }
 
-// 读取角色的 prologue 文件内容
-func readRolePrologue(rolePath string, roleBaseName string) string {
-	if roleBaseName == "" {
+// 读取角色的 prologue 文件内容（通过roleID定位）
+func readRolePrologue(rolePath string, roleID string) string {
+	if roleID == "" {
 		return ""
 	}
 
-	prologuePath := filepath.Join(rolePath, roleBaseName+".role", "prologue")
+	prologuePath := filepath.Join(rolePath, roleID+".role", "prologue")
 	content, err := os.ReadFile(prologuePath)
 	if err != nil {
 		return ""

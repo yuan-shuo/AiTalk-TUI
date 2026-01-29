@@ -1,18 +1,45 @@
 package role
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"aitalk/utils/hash"
 )
 
-func CreateRole(path string, name string, textEditor string) error {
-	// 创建角色目录
-	roleDir := filepath.Join(path, name+".role")
+// RoleMeta 角色元数据
+type RoleMeta struct {
+	Name string `json:"name"`
+}
+
+func CreateRole(path string, name string, textEditor string) (string, error) {
+	// 生成唯一ID
+	roleID, err := hash.GenerateID()
+	if err != nil {
+		return "", fmt.Errorf("生成角色ID失败: %w", err)
+	}
+
+	// 创建角色目录（使用ID作为目录名）
+	roleDir := filepath.Join(path, roleID+".role")
 	if err := os.MkdirAll(roleDir, 0755); err != nil {
-		return err
+		return "", err
+	}
+
+	// 创建 values.json 元数据文件
+	meta := RoleMeta{Name: name}
+	metaPath := filepath.Join(roleDir, "values.json")
+	metaData, err := json.MarshalIndent(meta, "", "  ")
+	if err != nil {
+		os.RemoveAll(roleDir)
+		return "", fmt.Errorf("序列化元数据失败: %w", err)
+	}
+	if err := os.WriteFile(metaPath, metaData, 0644); err != nil {
+		os.RemoveAll(roleDir)
+		return "", fmt.Errorf("写入元数据文件失败: %w", err)
 	}
 
 	// 创建 prologue 文件
@@ -20,7 +47,7 @@ func CreateRole(path string, name string, textEditor string) error {
 	if err := createFileWithEditor(prologuePath, textEditor, "角色的开场白"); err != nil {
 		// 清理角色目录
 		os.RemoveAll(roleDir)
-		return err
+		return "", err
 	}
 
 	// 创建 setting 文件
@@ -28,10 +55,10 @@ func CreateRole(path string, name string, textEditor string) error {
 	if err := createFileWithEditor(settingPath, textEditor, "角色的设定"); err != nil {
 		// 清理角色目录
 		os.RemoveAll(roleDir)
-		return err
+		return "", err
 	}
 
-	return nil
+	return roleID, nil
 }
 
 func createFileWithEditor(filePath string, textEditor string, description string) error {

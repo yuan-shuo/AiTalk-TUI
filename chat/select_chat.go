@@ -47,34 +47,39 @@ func askUseWhichChatToStart(arcDir string) (string, error) {
 }
 
 // 询问使用已有角色还是创建新角色
-func askUseWhichRole(roleDir string) (string, error) {
+// 返回角色ID（hash值）和角色显示名
+func askUseWhichRole(roleDir string) (string, string, error) {
 
 	fmt.Println("** 已有的角色id清单 / role id list **")
 
-	hash, err := archive.ReadRoleDirs(roleDir)
+	roles, err := archive.ReadRoleDirs(roleDir)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	hash[0] = newRoleName
-
-	for k, v := range hash {
-		name := strings.TrimSuffix(v, filepath.Ext(v))
-		fmt.Printf("[%d] %s\n", k, name)
+	// 显示角色列表
+	for k, v := range roles {
+		fmt.Printf("[%d] %s (%s)\n", k, v.Name, v.ID)
 	}
+	fmt.Printf("[0] %s\n", newRoleName)
 
 	in := bufio.NewScanner(os.Stdin)
 	fmt.Print("输入想要开始对话的角色id / select the number: ")
 	if !in.Scan() {
-		return "", fmt.Errorf("no input was given")
+		return "", "", fmt.Errorf("no input was given")
 	}
 	number, err := strconv.Atoi(in.Text())
 	if err != nil {
-		return "", fmt.Errorf("请输入一个已有的数字")
+		return "", "", fmt.Errorf("请输入一个已有的数字")
 	}
-	if roleName, ok := hash[number]; ok {
-		return roleName, nil
+
+	if number == 0 {
+		return "", "", nil // 创建新角色
+	}
+
+	if roleInfo, ok := roles[number]; ok {
+		return roleInfo.ID, roleInfo.Name, nil
 	} else {
-		return "", fmt.Errorf("请输入一个已有的数字")
+		return "", "", fmt.Errorf("请输入一个已有的数字")
 	}
 }

@@ -1,32 +1,59 @@
 package archive
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 )
 
+// RoleInfo 角色信息
+type RoleInfo struct {
+	ID   string // 角色目录ID (如 "a1b2c3d4")
+	Name string // 角色显示名 (如 "猫")
+}
+
 // ReadRoleDirs 扫描 root 下所有 *.role 目录
-// 返回 map[int]string，key 从 1 开始递增，value 就是目录名（如 "dog.role"）
-func ReadRoleDirs(root string) (map[int]string, error) {
+// 返回 map[int]RoleInfo，key 从 1 开始递增
+func ReadRoleDirs(root string) (map[int]RoleInfo, error) {
 	entries, err := os.ReadDir(root)
 	if err != nil {
 		return nil, err
 	}
 
-	var dirs []string
+	var roles []RoleInfo
 	for _, e := range entries {
-		if e.IsDir() && strings.HasSuffix(e.Name(), ".role") {
-			dirs = append(dirs, e.Name())
+		if !e.IsDir() || !strings.HasSuffix(e.Name(), ".role") {
+			continue
 		}
+
+		// 获取角色ID (去掉 .role 后缀)
+		roleID := strings.TrimSuffix(e.Name(), ".role")
+
+		// 读取 values.json 获取显示名
+		roleName := roleID // 默认使用ID作为名称
+		valuesPath := filepath.Join(root, e.Name(), "values.json")
+		if data, err := os.ReadFile(valuesPath); err == nil {
+			var meta struct {
+				Name string `json:"name"`
+			}
+			if err := json.Unmarshal(data, &meta); err == nil && meta.Name != "" {
+				roleName = meta.Name
+			}
+		}
+
+		roles = append(roles, RoleInfo{ID: roleID, Name: roleName})
 	}
 
-	sort.Strings(dirs)
+	// 按ID排序
+	sort.Slice(roles, func(i, j int) bool {
+		return roles[i].ID < roles[j].ID
+	})
 
-	out := make(map[int]string, len(dirs))
-	for idx, d := range dirs {
-		out[idx+1] = d
+	out := make(map[int]RoleInfo, len(roles))
+	for idx, r := range roles {
+		out[idx+1] = r
 	}
 	return out, nil
 }
