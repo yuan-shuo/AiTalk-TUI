@@ -48,3 +48,24 @@ att edit config
 /etc # 配置文件目录
 ```
 
+# 项目文档
+
+## 变量渲染
+
+于 `tui/value_render.go` 中统一维护：
+
+```go
+// 统一维护所有变量定义
+type VarMap map[string]string
+
+// 变量渲染表统一维护源
+func (m Model) GetVars() VarMap {
+	return VarMap{
+		// 代表将 {user} 替换为玩家名称
+		"user": m.playerName,
+		// 代表将 {role} 替换为角色名称
+		"role": m.roleName,
+	}
+}
+```
+

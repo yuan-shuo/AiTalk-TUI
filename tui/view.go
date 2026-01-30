@@ -99,11 +99,15 @@ func (m Model) renderMessage(msg json.Message) string {
 	// 替换变量（只对AI消息和系统消息替换，用户消息保持原样）
 	content := msg.Content
 	if msg.Role != "user" {
-		content = ReplaceWithContext(msg.Content, ReplaceContext{
-			PlayerName: m.playerName,
-			RoleName:   m.roleName,
-		})
+		// 渲染消息内部变量
+		content = ReplaceTextVarWithModelValues(msg.Content, m.GetVars())
 	}
+	// if msg.Role != "user" {
+	// 	content = ReplaceWithContext(msg.Content, ReplaceContext{
+	// 		PlayerName: m.playerName,
+	// 		RoleName:   m.roleName,
+	// 	})
+	// }
 
 	switch msg.Role {
 	case "user":
