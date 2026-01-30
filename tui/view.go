@@ -146,9 +146,20 @@ func wrapText(text string, maxWidth int) string {
 	return strings.Join(result, "\n")
 }
 
+// escapeLipglossChars 转义 lipgloss 特殊字符
+func escapeLipglossChars(text string) string {
+	// 转义可能导致渲染问题的字符
+	text = strings.ReplaceAll(text, "\x1b", "") // 移除 ESC 字符
+	text = strings.ReplaceAll(text, "\x00", "") // 移除空字符
+	return text
+}
+
 // renderUserMessage 渲染用户消息
 func (m Model) renderUserMessage(content string) string {
 	name := userNameStyle.Render(fmt.Sprintf("[%s]", m.playerName))
+
+	// 转义特殊字符
+	content = escapeLipglossChars(content)
 
 	// 计算可用宽度（考虑边距和气泡样式）
 	maxContentWidth := m.width - 10
@@ -159,17 +170,10 @@ func (m Model) renderUserMessage(content string) string {
 	// 自动换行处理
 	wrappedContent := wrapText(content, maxContentWidth)
 
-	// 处理多行内容
-	lines := strings.Split(wrappedContent, "\n")
-	var contentLines []string
-	for _, line := range lines {
-		contentLines = append(contentLines, messageContentStyle.Render(line))
-	}
-	renderedContent := strings.Join(contentLines, "\n")
+	// 直接使用气泡样式渲染，不再逐行处理
+	bubble := userBubbleStyle.Render(wrappedContent)
 
 	// 用户消息右对齐
-	bubble := userBubbleStyle.Render(renderedContent)
-
 	return lipgloss.PlaceHorizontal(m.width, lipgloss.Right,
 		lipgloss.JoinVertical(lipgloss.Right, name, bubble))
 }
@@ -177,6 +181,9 @@ func (m Model) renderUserMessage(content string) string {
 // renderAgentMessage 渲染AI消息
 func (m Model) renderAgentMessage(content string) string {
 	name := agentNameStyle.Render(fmt.Sprintf("[%s]", m.roleName))
+
+	// 转义特殊字符
+	content = escapeLipglossChars(content)
 
 	// 计算可用宽度（考虑边距和气泡样式）
 	maxContentWidth := m.width - 6
@@ -187,15 +194,8 @@ func (m Model) renderAgentMessage(content string) string {
 	// 自动换行处理
 	wrappedContent := wrapText(content, maxContentWidth)
 
-	// 处理多行内容
-	lines := strings.Split(wrappedContent, "\n")
-	var contentLines []string
-	for _, line := range lines {
-		contentLines = append(contentLines, messageContentStyle.Render(line))
-	}
-	renderedContent := strings.Join(contentLines, "\n")
-
-	bubble := agentBubbleStyle.Render(renderedContent)
+	// 直接使用气泡样式渲染
+	bubble := agentBubbleStyle.Render(wrappedContent)
 
 	return lipgloss.JoinVertical(lipgloss.Left, name, bubble)
 }
@@ -203,6 +203,9 @@ func (m Model) renderAgentMessage(content string) string {
 // renderSystemMessage 渲染系统消息
 func (m Model) renderSystemMessage(content string) string {
 	name := systemNameStyle.Render("[System]")
+
+	// 转义特殊字符
+	content = escapeLipglossChars(content)
 
 	// 计算可用宽度
 	maxContentWidth := m.width - 4
@@ -213,13 +216,8 @@ func (m Model) renderSystemMessage(content string) string {
 	// 自动换行处理
 	wrappedContent := wrapText(content, maxContentWidth)
 
-	// 处理多行内容
-	lines := strings.Split(wrappedContent, "\n")
-	var contentLines []string
-	for _, line := range lines {
-		contentLines = append(contentLines, messageContentStyle.Render(line))
-	}
-	renderedContent := strings.Join(contentLines, "\n")
+	// 直接使用样式渲染
+	renderedContent := messageContentStyle.Render(wrappedContent)
 
 	return lipgloss.JoinVertical(lipgloss.Left, name, renderedContent)
 }
